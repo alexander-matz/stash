@@ -1,0 +1,31 @@
+#!/bin/bash
+# vim: ts=2 sts=2 sw=2 et ai
+
+URL=http://localhost:7878
+SECRET=$(cat ~/.stash-secret)
+
+usage () {
+  echo "usage:"
+  echo "  stash put <file>"
+  echo "  stash get <hash>"
+  echo "  stash delete <hash>"
+}
+
+case "$1" in
+  put)
+    shift
+    { echo "$SECRET" ; cat "$1" ; } | curl $URL/put -X POST --data-binary @-
+    ;;
+  get)
+    shift
+    curl $URL/get/$1
+    ;;
+  delete)
+    shift
+    { echo "$SECRET" ; echo "$1" ; } | curl $URL/delete -X POST --data-binary @-
+    ;;
+  *)
+    echo "invalid command: $1"
+    usage
+    exit 1
+esac
